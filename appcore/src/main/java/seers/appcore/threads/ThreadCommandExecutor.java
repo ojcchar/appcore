@@ -42,7 +42,7 @@ public class ThreadCommandExecutor {
 				threadFactory, handler);
 	}
 
-	public void exeucuteCommRunnable(CommandLatchRunnable comm) {
+	public void executeCommRunnable(CommandLatchRunnable comm) {
 		executor.execute(comm);
 	}
 

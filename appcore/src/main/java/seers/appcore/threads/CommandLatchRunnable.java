@@ -13,9 +13,16 @@ public class CommandLatchRunnable implements Runnable {
 
 	private CountDownLatch cntDwnLatch;
 	private ThreadProcessor proc;
+	private Long initialCount;
 
 	public CommandLatchRunnable(ThreadProcessor proc) {
 		this.proc = proc;
+	}
+
+	public CommandLatchRunnable(ThreadProcessor proc, CountDownLatch cntDwnLatch, Long initialCount) {
+		this.cntDwnLatch = cntDwnLatch;
+		this.proc = proc;
+		this.initialCount = initialCount;
 	}
 
 	public CommandLatchRunnable(ThreadProcessor proc, CountDownLatch cntDwnLatch) {
@@ -32,6 +39,11 @@ public class CommandLatchRunnable implements Runnable {
 		} finally {
 			if (cntDwnLatch != null) {
 				cntDwnLatch.countDown();
+
+				if (initialCount != null) {
+					long count = initialCount - cntDwnLatch.getCount();
+					LOGGER.debug("Jobs done: " + count + "/" + initialCount);
+				}
 			}
 		}
 
