@@ -1,8 +1,26 @@
 package seers.appcore.threads.processor;
 
-public interface ThreadProcessor {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	void processJob() throws ThreadException;
+public abstract class ThreadProcessor {
 
-	String getName();
+	protected ThreadParameters params;
+	private String threadName;
+	protected Logger LOGGER;
+
+	public ThreadProcessor(ThreadParameters params) {
+		this.params = params;
+	}
+
+	abstract public void executeJob() throws Exception;
+
+	public String getThreadName() {
+		return threadName;
+	}
+
+	public void setThreadName(String threadName) {
+		this.threadName = threadName;
+		LOGGER = LoggerFactory.getLogger(threadName);
+	}
 }

@@ -33,9 +33,9 @@ public class CommandLatchRunnable implements Runnable {
 	@Override
 	public void run() {
 		try {
-			proc.processJob();
+			proc.executeJob();
 		} catch (Exception e) {
-			LOGGER.error(proc.getName() + ": ", e);
+			LOGGER.error(proc.getThreadName() + ": ", e);
 		} finally {
 			if (cntDwnLatch != null) {
 				cntDwnLatch.countDown();
@@ -50,7 +50,7 @@ public class CommandLatchRunnable implements Runnable {
 	}
 
 	public String getName() {
-		return proc.getName();
+		return proc.getThreadName();
 	}
 
 }
