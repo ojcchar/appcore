@@ -43,4 +43,8 @@ public class ThreadParameters {
 		removeParam(param1);
 		addParam(param2, val1);
 	}
+
+	public Integer getIntegerParam(String param) {
+		return getParam(Integer.class, param);
+	}
 }
