@@ -11,6 +11,7 @@ public abstract class ThreadProcessor {
 
 	public ThreadProcessor(ThreadParameters params) {
 		this.params = params;
+		LOGGER = LoggerFactory.getLogger(this.getClass());
 	}
 
 	abstract public void executeJob() throws Exception;
