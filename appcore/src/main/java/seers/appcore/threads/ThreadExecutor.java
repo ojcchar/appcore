@@ -42,7 +42,7 @@ public class ThreadExecutor {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static void executePaginated(final List objects, Class<? extends ThreadProcessor> class1,
+	public static List<ThreadProcessor> executePaginated(final List objects, Class<? extends ThreadProcessor> class1,
 			final ThreadParameters params, int poolSize) throws Exception {
 
 		ThreadCommandExecutor executor = new ThreadCommandExecutor();
@@ -74,6 +74,8 @@ public class ThreadExecutor {
 				executor.executeCommRunnable(new CommandLatchRunnable(proc, cntDwnLatch));
 			}
 			cntDwnLatch.await();
+
+			return procs;
 
 		} finally {
 			executor.shutdown();
