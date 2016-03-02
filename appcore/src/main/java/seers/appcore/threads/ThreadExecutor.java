@@ -9,6 +9,8 @@ import seers.appcore.threads.processor.ThreadProcessor;
 
 public class ThreadExecutor {
 
+	public static final String ELEMENTS_PARAM = "elements";
+
 	@SuppressWarnings("rawtypes")
 	public static void executeOneByOne(final List objects, Class<? extends ThreadProcessor> class1,
 			final ThreadParameters params, int poolSize) throws Exception {
@@ -63,7 +65,7 @@ public class ThreadExecutor {
 				List sublist = objects.subList(fromIndex, toIndex);
 
 				ThreadParameters newParams = new ThreadParameters(params);
-				newParams.addParam("elements", sublist);
+				newParams.addParam(ELEMENTS_PARAM, sublist);
 				ThreadProcessor newInstance = class1.getConstructor(ThreadParameters.class).newInstance(newParams);
 				procs.add(newInstance);
 			}
