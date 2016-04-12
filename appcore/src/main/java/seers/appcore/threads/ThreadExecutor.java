@@ -9,6 +9,7 @@ import seers.appcore.threads.processor.ThreadProcessor;
 
 public class ThreadExecutor {
 
+	public static final String ELEMENT_PARAM = "element";
 	public static final String ELEMENTS_PARAM = "elements";
 
 	@SuppressWarnings("rawtypes")
@@ -25,7 +26,7 @@ public class ThreadExecutor {
 			for (Object element : objects) {
 
 				ThreadParameters newParams = new ThreadParameters(params);
-				newParams.addParam("element", element);
+				newParams.addParam(ELEMENT_PARAM, element);
 
 				ThreadProcessor newInstance = class1.getConstructor(ThreadParameters.class).newInstance(newParams);
 				procs.add(newInstance);
