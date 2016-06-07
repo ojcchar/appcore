@@ -46,8 +46,7 @@ public class ThreadExecutor {
 
 	@SuppressWarnings("rawtypes")
 	public static List<ThreadProcessor> executePaginated(final List objects, Class<? extends ThreadProcessor> class1,
-			final ThreadParameters params, int poolSize) throws Exception {
-
+			final ThreadParameters params, int poolSize, int pageSize) throws Exception {
 		ThreadCommandExecutor executor = new ThreadCommandExecutor();
 		executor.setCorePoolSize(poolSize);
 		try {
@@ -55,7 +54,6 @@ public class ThreadExecutor {
 			// create the threads
 			List<ThreadProcessor> procs = new ArrayList<>();
 			int num = objects.size();
-			int pageSize = 50;
 			for (int offset = 0; offset < num; offset += pageSize) {
 
 				int fromIndex = offset;
@@ -83,7 +81,12 @@ public class ThreadExecutor {
 		} finally {
 			executor.shutdown();
 		}
+	}
 
+	@SuppressWarnings("rawtypes")
+	public static List<ThreadProcessor> executePaginated(final List objects, Class<? extends ThreadProcessor> class1,
+			final ThreadParameters params, int poolSize) throws Exception {
+		return executePaginated(objects, class1, params, poolSize, 50);
 	}
 
 }
