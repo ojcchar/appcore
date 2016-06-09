@@ -89,4 +89,15 @@ public class ThreadExecutor {
 		return executePaginated(objects, class1, params, poolSize, 50);
 	}
 
+	@SuppressWarnings("rawtypes")
+	public static List<ThreadProcessor> executePaginated(final List objects, Class<? extends ThreadProcessor> class1,
+			final ThreadParameters params) throws Exception {
+
+		// threads
+		int poolSize = 15;
+		int pageSize = (int) Math.ceil((double) objects.size() / poolSize);
+
+		return executePaginated(objects, class1, params, poolSize, pageSize);
+	}
+
 }
