@@ -95,9 +95,15 @@ public class ThreadExecutor {
 
 		// threads
 		int poolSize = 15;
-		int pageSize = (int) Math.ceil((double) objects.size() / poolSize);
+		int pageSize = getPageSize(objects, poolSize);
 
 		return executePaginated(objects, class1, params, poolSize, pageSize);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static int getPageSize(final List objects, int poolSize) {
+		int pageSize = (int) Math.ceil((double) objects.size() / poolSize);
+		return pageSize;
 	}
 
 }
