@@ -13,7 +13,7 @@ public class ThreadExecutor {
 	public static final String ELEMENTS_PARAM = "elements";
 
 	@SuppressWarnings("rawtypes")
-	public static void executeOneByOne(final List objects, Class<? extends ThreadProcessor> class1,
+	public static List<ThreadProcessor> executeOneByOne(final List objects, Class<? extends ThreadProcessor> class1,
 			final ThreadParameters params, int poolSize) throws Exception {
 
 		ThreadCommandExecutor executor = new ThreadCommandExecutor();
@@ -39,6 +39,7 @@ public class ThreadExecutor {
 			}
 			cntDwnLatch.await();
 
+			return procs;
 		} finally {
 			executor.shutdown();
 		}
