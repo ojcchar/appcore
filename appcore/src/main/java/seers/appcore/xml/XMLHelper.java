@@ -44,6 +44,11 @@ public class XMLHelper {
 		return readXML(class1, new File(filepath));
 	}
 
+	public static void writeXML(Class<?> class1, Object obj, String outputFile)
+			throws FileNotFoundException, JAXBException {
+		writeXML(class1, obj, new File(outputFile));
+	}
+
 	public static void writeXML(Class<?> class1, Object obj, File outputFile)
 			throws JAXBException, FileNotFoundException {
 		JAXBContext context = JAXBContext.newInstance(class1);
