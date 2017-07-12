@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -55,10 +56,11 @@ public class CSVHelper {
 		writeCsv(new File(filePath), header, data, entryPrefix, entryFunction);
 	}
 
-	public static <T> void writeCsv(File file, List<String> header, List<T> data, List<String> entryPrefix,
+	public static <T> void writeCsv(File file, List<String> header, Collection<T> data, List<String> entryPrefix,
 			Function<T, List<String>> entryFunction) throws IOException {
 
-		try (CsvWriter writer = new CsvWriterBuilder(new FileWriter(file)).separator(';').build()) {
+		try (CsvWriter writer = new CsvWriterBuilder(new FileWriter(file)).separator(';')
+				.escapeChar(CsvWriter.NO_ESCAPE_CHARACTER).build()) {
 
 			if (header != null) {
 				writer.writeNext(header);
@@ -66,15 +68,56 @@ public class CSVHelper {
 
 			for (T t : data) {
 
+				List<String> entrySuffix = entryFunction.apply(t);
+				if (entrySuffix == null) {
+					continue;
+				}
+
 				List<String> nextLine = new ArrayList<>();
 				if (entryPrefix != null) {
 					nextLine.addAll(entryPrefix);
 				}
 
-				List<String> entrySuffix = entryFunction.apply(t);
 				nextLine.addAll(entrySuffix);
 
 				writer.writeNext(nextLine);
+			}
+
+		}
+
+	}
+
+	public static <T> void writeCsvMultiple(File file, List<String> header, Collection<T> data,
+			List<String> entryPrefix, Function<T, List<List<String>>> entryFunction) throws IOException {
+
+		try (CsvWriter writer = new CsvWriterBuilder(new FileWriter(file)).separator(';')
+				.escapeChar(CsvWriter.NO_ESCAPE_CHARACTER).build()) {
+
+			if (header != null) {
+				writer.writeNext(header);
+			}
+
+			for (T t : data) {
+
+				List<List<String>> entries = entryFunction.apply(t);
+
+				if (entries == null) {
+					continue;
+				}
+
+				List<List<String>> allLines = new ArrayList<>();
+
+				for (List<String> entry : entries) {
+					List<String> nextLine = new ArrayList<>();
+					if (entryPrefix != null) {
+						nextLine.addAll(entryPrefix);
+					}
+					nextLine.addAll(entry);
+
+					allLines.add(nextLine);
+				}
+				writer.writeAll(allLines);
+
 			}
 
 		}
