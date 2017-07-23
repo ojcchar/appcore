@@ -87,7 +87,8 @@ public class ThreadExecutor {
 	@SuppressWarnings("rawtypes")
 	public static List<ThreadProcessor> executePaginated(final List objects, Class<? extends ThreadProcessor> class1,
 			final ThreadParameters params, int poolSize) throws Exception {
-		return executePaginated(objects, class1, params, poolSize, 50);
+		int pageSize = getPageSize(objects, poolSize);
+		return executePaginated(objects, class1, params, poolSize, pageSize);
 	}
 
 	@SuppressWarnings("rawtypes")
