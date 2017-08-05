@@ -7,7 +7,11 @@ public class ExceptionUtils {
 	}
 
 	public static RuntimeException getRuntimeException(Exception e) {
-		RuntimeException e2 = new RuntimeException(e.getMessage());
+		String message = e.getMessage();
+		if (message == null) {
+			message = e.getClass().getName();
+		}
+		RuntimeException e2 = new RuntimeException(message);
 		ExceptionUtils.addStackTrace(e, e2);
 		return e2;
 	}
