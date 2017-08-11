@@ -19,15 +19,23 @@ import net.quux00.simplecsv.CsvWriterBuilder;
 
 public class CSVHelper {
 
-	public static <T> List<T> readCsv(String filePath, boolean skipHeader, Function<List<String>, T> entryFunction)
+	public static List<List<String>> readCsv(String filePath, boolean skipHeader, char separator)
 			throws UnsupportedEncodingException, IOException {
-		return readCsv(new File(filePath), skipHeader, entryFunction);
+		Function<List<String>, List<String>> entryFunction = (entry) -> {
+			return entry;
+		};
+		return readCsv(new File(filePath), skipHeader, entryFunction, separator);
 	}
 
-	public static <T> List<T> readCsv(File file, boolean skipHeader, Function<List<String>, T> entryFunction)
+	public static <T> List<T> readCsv(String filePath, boolean skipHeader, Function<List<String>, T> entryFunction, char separator)
+			throws UnsupportedEncodingException, IOException {
+		return readCsv(new File(filePath), skipHeader, entryFunction, separator);
+	}
+
+	public static <T> List<T> readCsv(File file, boolean skipHeader, Function<List<String>, T> entryFunction, char separator)
 			throws UnsupportedEncodingException, IOException {
 
-		CsvParser csvParser = new CsvParserBuilder().multiLine(true).separator(';').build();
+		CsvParser csvParser = new CsvParserBuilder().multiLine(true).separator(separator).build();
 		try (CsvReader csvReader = new CsvReader(new InputStreamReader(new FileInputStream(file), "Cp1252"),
 				csvParser)) {
 
@@ -52,14 +60,14 @@ public class CSVHelper {
 	}
 
 	public static <T> void writeCsv(String filePath, List<String> header, List<T> data, List<String> entryPrefix,
-			Function<T, List<String>> entryFunction) throws IOException {
-		writeCsv(new File(filePath), header, data, entryPrefix, entryFunction);
+			Function<T, List<String>> entryFunction, char separator) throws IOException {
+		writeCsv(new File(filePath), header, data, entryPrefix, entryFunction,separator);
 	}
 
 	public static <T> void writeCsv(File file, List<String> header, Collection<T> data, List<String> entryPrefix,
-			Function<T, List<String>> entryFunction) throws IOException {
+			Function<T, List<String>> entryFunction, char separator) throws IOException {
 
-		try (CsvWriter writer = new CsvWriterBuilder(new FileWriter(file)).separator(';')
+		try (CsvWriter writer = new CsvWriterBuilder(new FileWriter(file)).separator(separator)
 				.escapeChar(CsvWriter.NO_ESCAPE_CHARACTER).build()) {
 
 			if (header != null) {
@@ -88,9 +96,9 @@ public class CSVHelper {
 	}
 
 	public static <T> void writeCsvMultiple(File file, List<String> header, Collection<T> data,
-			List<String> entryPrefix, Function<T, List<List<String>>> entryFunction) throws IOException {
+			List<String> entryPrefix, Function<T, List<List<String>>> entryFunction, char separator) throws IOException {
 
-		try (CsvWriter writer = new CsvWriterBuilder(new FileWriter(file)).separator(';')
+		try (CsvWriter writer = new CsvWriterBuilder(new FileWriter(file)).separator(separator)
 				.escapeChar(CsvWriter.NO_ESCAPE_CHARACTER).build()) {
 
 			if (header != null) {
