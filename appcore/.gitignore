@@ -1,4 +1,7 @@
 /target/
+
+
+### IntelliJ ###
 *.iml
 *.ipr
 *.iws
