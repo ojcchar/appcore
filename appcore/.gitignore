@@ -1,8 +1,14 @@
 /target/
 
-
 ### IntelliJ ###
 *.iml
 *.ipr
 *.iws
 .idea/
+
+### Gradle ###
+build/
+.gradle/
+out/
+/bin/
+/gradle/
