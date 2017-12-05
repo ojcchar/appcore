@@ -25,7 +25,7 @@ public class FilePathUtils {
 		return getFileFromObjects(baseFolder, separator, objs);
 	}
 
-	public static File getFileFromObjects(File baseFolder, String separator, Object... objs) {
+	private static File getFileFromObjects(File baseFolder, String separator, Object... objs) {
 		StringBuilder builder = new StringBuilder(baseFolder.getAbsolutePath());
 		builder.append(File.separator);
 
