@@ -1,12 +1,8 @@
 package seers.appcore.xml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -15,85 +11,84 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
+import java.io.*;
 
 public class XMLHelper {
 
-	private static final String DEFAULT_ENCODING = "UTF-8";
+    private static final String DEFAULT_ENCODING = "UTF-8";
 
-	@SuppressWarnings("unchecked")
-	public static <T> T readXMLFromString(Class<?> class1, String content)
-			throws JAXBException, FileNotFoundException, SAXException, ParserConfigurationException {
-		JAXBContext context = JAXBContext.newInstance(class1);
+    @SuppressWarnings("unchecked")
+    public static <T> T readXMLFromString(Class<?> class1, String content)
+            throws JAXBException, IOException, SAXException, ParserConfigurationException {
+        try (Reader reader = new StringReader(content)) {
+            return readXMLFromReader(class1, reader);
+        }
+    }
 
-		Unmarshaller um = context.createUnmarshaller();
+    public static <T> T readXML(Class<?> class1, String filepath)
+            throws JAXBException, IOException, SAXException, ParserConfigurationException {
+        return readXML(class1, new File(filepath));
+    }
 
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		spf.setFeature("http://xml.org/sax/features/validation", false);
+    @Deprecated
+    public static void writeXML(Class<?> class1, Object obj, String outputFile)
+            throws FileNotFoundException, JAXBException {
+        writeXML(class1, obj, new File(outputFile));
+    }
 
-		XMLReader xr = (XMLReader) spf.newSAXParser().getXMLReader();
-		try (StringReader reader = new StringReader(content)) {
-			SAXSource source = new SAXSource(xr, new InputSource(reader));
+    @Deprecated
+    public static void writeXML(Class<?> class1, Object obj, File outputFile)
+            throws JAXBException, FileNotFoundException {
+        JAXBContext context = JAXBContext.newInstance(class1);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        m.marshal(obj, outputFile);
+    }
 
-			T obj = (T) um.unmarshal(source);
-			return obj;
-		}
-	}
+    public static void writeXML(Object obj, String outputFile) throws FileNotFoundException, JAXBException {
+        writeXML(obj, new File(outputFile));
+    }
 
-	public static <T> T readXML(Class<?> class1, String filepath)
-			throws JAXBException, IOException, SAXException, ParserConfigurationException {
-		return readXML(class1, new File(filepath));
-	}
+    public static void writeXML(Object obj, File outputFile) throws JAXBException, FileNotFoundException {
+        JAXBContext context = JAXBContext.newInstance(obj.getClass());
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        m.setProperty(Marshaller.JAXB_ENCODING, DEFAULT_ENCODING);
+        m.marshal(obj, outputFile);
+    }
 
-	@Deprecated
-	public static void writeXML(Class<?> class1, Object obj, String outputFile)
-			throws FileNotFoundException, JAXBException {
-		writeXML(class1, obj, new File(outputFile));
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T readXML(Class<?> class1, File file)
+            throws JAXBException, IOException, SAXException, ParserConfigurationException {
+        try (Reader reader = new InputStreamReader(new FileInputStream(file), DEFAULT_ENCODING);) {
+            return readXMLFromReader(class1, reader);
+        }
+    }
 
-	@Deprecated
-	public static void writeXML(Class<?> class1, Object obj, File outputFile)
-			throws JAXBException, FileNotFoundException {
-		JAXBContext context = JAXBContext.newInstance(class1);
-		Marshaller m = context.createMarshaller();
-		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		m.marshal(obj, outputFile);
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T readXMLContent(Class<?> class1, String content)
+            throws JAXBException, IOException, SAXException, ParserConfigurationException {
+        try (Reader reader = new StringReader(content)) {
+            return readXMLFromReader(class1, reader);
+        }
+    }
 
-	public static void writeXML(Object obj, String outputFile) throws FileNotFoundException, JAXBException {
-		writeXML(obj, new File(outputFile));
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T readXMLFromReader(Class<?> class1, Reader reader)
+            throws JAXBException, SAXException, ParserConfigurationException {
+        JAXBContext context = JAXBContext.newInstance(class1);
 
-	public static void writeXML(Object obj, File outputFile) throws JAXBException, FileNotFoundException {
-		JAXBContext context = JAXBContext.newInstance(obj.getClass());
-		Marshaller m = context.createMarshaller();
-		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		m.setProperty(Marshaller.JAXB_ENCODING, DEFAULT_ENCODING);
-		m.marshal(obj, outputFile);
-	}
+        Unmarshaller um = context.createUnmarshaller();
 
-	@SuppressWarnings("unchecked")
-	public static <T> T readXML(Class<?> class1, File file)
-			throws JAXBException, IOException, SAXException, ParserConfigurationException {
-		JAXBContext context = JAXBContext.newInstance(class1);
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        spf.setFeature("http://xml.org/sax/features/validation", false);
 
-		Unmarshaller um = context.createUnmarshaller();
+        XMLReader xr = (XMLReader) spf.newSAXParser().getXMLReader();
+        SAXSource source = new SAXSource(xr, new InputSource(reader));
 
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		spf.setFeature("http://xml.org/sax/features/validation", false);
-
-		XMLReader xr = (XMLReader) spf.newSAXParser().getXMLReader();
-		try (Reader reader = new InputStreamReader(new FileInputStream(file), DEFAULT_ENCODING);) {
-			SAXSource source = new SAXSource(xr, new InputSource(reader));
-
-			T obj = (T) um.unmarshal(source);
-			return obj;
-		}
-	}
+        T obj = (T) um.unmarshal(source);
+        return obj;
+    }
 
 }
