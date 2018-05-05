@@ -21,12 +21,14 @@ public class CSVHelper {
 
 	public static final char DEFAULT_SEPARATOR = ';';
 
+	public static List<List<String>> readCsv(String filePath, boolean skipHeader)
+			throws UnsupportedEncodingException, IOException {
+		return readCsv(new File(filePath), skipHeader, Function.identity(), DEFAULT_SEPARATOR);
+	}
+
 	public static List<List<String>> readCsv(String filePath, boolean skipHeader, char separator)
 			throws UnsupportedEncodingException, IOException {
-		Function<List<String>, List<String>> entryFunction = (entry) -> {
-			return entry;
-		};
-		return readCsv(new File(filePath), skipHeader, entryFunction, separator);
+		return readCsv(new File(filePath), skipHeader, Function.identity(), separator);
 	}
 
 	public static <T> List<T> readCsv(String filePath, boolean skipHeader, Function<List<String>, T> entryFunction,
