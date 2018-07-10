@@ -4,7 +4,8 @@ import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
 
-
+@Deprecated
+//use Paths.get instead
 public class FilePathUtils {
 
 	public static File getFile(File baseFolder, String... subfolders) {
