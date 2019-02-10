@@ -1,153 +1,154 @@
 package seers.appcore.csv;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import net.quux00.simplecsv.*;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import net.quux00.simplecsv.CsvParser;
-import net.quux00.simplecsv.CsvParserBuilder;
-import net.quux00.simplecsv.CsvReader;
-import net.quux00.simplecsv.CsvWriter;
-import net.quux00.simplecsv.CsvWriterBuilder;
-
 public class CSVHelper {
 
-	public static final char DEFAULT_SEPARATOR = ';';
+    public static final char DEFAULT_SEPARATOR = ';';
+    public static final String DEFAULT_CHARSET = "Cp1252";
 
-	public static List<List<String>> readCsv(String filePath, boolean skipHeader)
-			throws UnsupportedEncodingException, IOException {
-		return readCsv(new File(filePath), skipHeader, Function.identity(), DEFAULT_SEPARATOR);
-	}
+    public static List<List<String>> readCsv(String filePath, boolean skipHeader)
+            throws IOException {
+        return readCsv(new File(filePath), skipHeader, Function.identity(), DEFAULT_SEPARATOR, DEFAULT_CHARSET);
+    }
 
-	public static List<List<String>> readCsv(String filePath, boolean skipHeader, char separator)
-			throws UnsupportedEncodingException, IOException {
-		return readCsv(new File(filePath), skipHeader, Function.identity(), separator);
-	}
+    public static List<List<String>> readCsv(String filePath, boolean skipHeader, char separator)
+            throws IOException {
+        return readCsv(new File(filePath), skipHeader, Function.identity(), separator, DEFAULT_CHARSET);
+    }
 
-	public static <T> List<T> readCsv(String filePath, boolean skipHeader, Function<List<String>, T> entryFunction,
-			char separator) throws UnsupportedEncodingException, IOException {
-		return readCsv(new File(filePath), skipHeader, entryFunction, separator);
-	}
+    public static <T> List<T> readCsv(String filePath, boolean skipHeader, Function<List<String>, T> entryFunction,
+                                      char separator) throws IOException {
+        return readCsv(new File(filePath), skipHeader, entryFunction, separator, DEFAULT_CHARSET);
+    }
 
-	public static <T> List<T> readCsv(File file, boolean skipHeader, Function<List<String>, T> entryFunction,
-			char separator) throws UnsupportedEncodingException, IOException {
 
-		CsvParser csvParser = new CsvParserBuilder().multiLine(true).separator(separator).build();
-		try (CsvReader csvReader = new CsvReader(new InputStreamReader(new FileInputStream(file), "Cp1252"),
-				csvParser)) {
+    public static List<List<String>> readCsv(File file, boolean skipHeader, char separator, String charSet)
+            throws IOException {
+        return readCsv(file, skipHeader, Function.identity(), separator, charSet);
+    }
 
-			boolean headerSkipped = false;
 
-			List<T> data = new ArrayList<>();
-			for (List<String> line : csvReader) {
+    public static <T> List<T> readCsv(File file, boolean skipHeader, Function<List<String>, T> entryFunction,
+                                      char separator, String charSet) throws IOException {
 
-				if (!headerSkipped && skipHeader) {
-					headerSkipped = true;
-					continue;
-				}
+        CsvParser csvParser = new CsvParserBuilder().multiLine(true).separator(separator).build();
+        try (CsvReader csvReader = new CsvReader(new InputStreamReader(new FileInputStream(file),
+                charSet),
+                csvParser)) {
 
-				T entry = entryFunction.apply(line);
-				if (entry != null) {
-					data.add(entry);
-				}
-			}
+            boolean headerSkipped = false;
 
-			return data;
-		}
-	}
+            List<T> data = new ArrayList<>();
+            for (List<String> line : csvReader) {
 
-	public static <T> void writeCsv(String filePath, List<String> header, List<T> data, List<String> entryPrefix,
-			Function<T, List<String>> entryFunction, char separator) throws IOException {
-		writeCsv(new File(filePath), header, data, entryPrefix, entryFunction, separator);
-	}
+                if (!headerSkipped && skipHeader) {
+                    headerSkipped = true;
+                    continue;
+                }
 
-	public static <T> void writeCsv(File file, List<String> header, Collection<T> data, List<String> entryPrefix,
-			Function<T, List<String>> entryFunction, char separator) throws IOException {
+                T entry = entryFunction.apply(line);
+                if (entry != null) {
+                    data.add(entry);
+                }
+            }
 
-		try (CsvWriter writer = getWriter(file, separator)) {
-			writeCsv(writer, header, data, entryPrefix, entryFunction);
-		}
+            return data;
+        }
+    }
 
-	}
+    public static <T> void writeCsv(String filePath, List<String> header, List<T> data, List<String> entryPrefix,
+                                    Function<T, List<String>> entryFunction, char separator) throws IOException {
+        writeCsv(new File(filePath), header, data, entryPrefix, entryFunction, separator);
+    }
 
-	public static <T> void writeCsv(CsvWriter writer, List<String> header, Collection<T> data, List<String> entryPrefix,
-			Function<T, List<String>> entryFunction) {
-		if (header != null) {
-			writer.writeNext(header);
-		}
+    public static <T> void writeCsv(File file, List<String> header, Collection<T> data, List<String> entryPrefix,
+                                    Function<T, List<String>> entryFunction, char separator) throws IOException {
 
-		for (T t : data) {
+        try (CsvWriter writer = getWriter(file, separator)) {
+            writeCsv(writer, header, data, entryPrefix, entryFunction);
+        }
 
-			List<String> entrySuffix = entryFunction.apply(t);
-			if (entrySuffix == null) {
-				continue;
-			}
+    }
 
-			List<String> nextLine = new ArrayList<>();
-			if (entryPrefix != null) {
-				nextLine.addAll(entryPrefix);
-			}
+    public static <T> void writeCsv(CsvWriter writer, List<String> header, Collection<T> data, List<String> entryPrefix,
+                                    Function<T, List<String>> entryFunction) {
+        if (header != null) {
+            writer.writeNext(header);
+        }
 
-			nextLine.addAll(entrySuffix);
+        for (T t : data) {
 
-			writer.writeNext(nextLine);
-		}
-	}
+            List<String> entrySuffix = entryFunction.apply(t);
+            if (entrySuffix == null) {
+                continue;
+            }
 
-	private static CsvWriter getWriter(File file, char separator) throws IOException {
-		return getWriter(file, separator, false);
-	}
+            List<String> nextLine = new ArrayList<>();
+            if (entryPrefix != null) {
+                nextLine.addAll(entryPrefix);
+            }
 
-	public static CsvWriter getWriter(File file, char separator, boolean append) throws IOException {
-		return new CsvWriterBuilder(new FileWriter(file, append)).separator(separator)
-				.escapeChar(CsvWriter.NO_ESCAPE_CHARACTER).build();
-	}
+            nextLine.addAll(entrySuffix);
 
-	public static <T> void writeCsvMultiple(File file, List<String> header, Collection<T> data,
-			List<String> entryPrefix, Function<T, List<List<String>>> entryFunction, char separator)
-			throws IOException {
+            writer.writeNext(nextLine);
+        }
+    }
 
-		try (CsvWriter writer = getWriter(file, separator)) {
-			writeCsVMultiple(writer, header, data, entryPrefix, entryFunction);
-		}
+    private static CsvWriter getWriter(File file, char separator) throws IOException {
+        return getWriter(file, separator, false);
+    }
 
-	}
+    public static CsvWriter getWriter(File file, char separator, boolean append) throws IOException {
+        return new CsvWriterBuilder(new FileWriter(file, append)).separator(separator)
+                .escapeChar(CsvWriter.NO_ESCAPE_CHARACTER).build();
+    }
 
-	public static <T> void writeCsVMultiple(CsvWriter writer, List<String> header, Collection<T> data,
-			List<String> entryPrefix, Function<T, List<List<String>>> entryFunction) {
-		
-		if (header != null) {
-			writer.writeNext(header);
-		}
+    public static <T> void writeCsvMultiple(File file, List<String> header, Collection<T> data,
+                                            List<String> entryPrefix, Function<T, List<List<String>>> entryFunction,
+                                            char separator)
+            throws IOException {
 
-		for (T t : data) {
+        try (CsvWriter writer = getWriter(file, separator)) {
+            writeCsVMultiple(writer, header, data, entryPrefix, entryFunction);
+        }
 
-			List<List<String>> entries = entryFunction.apply(t);
+    }
 
-			if (entries == null) {
-				continue;
-			}
+    public static <T> void writeCsVMultiple(CsvWriter writer, List<String> header, Collection<T> data,
+                                            List<String> entryPrefix, Function<T, List<List<String>>> entryFunction) {
 
-			List<List<String>> allLines = new ArrayList<>();
+        if (header != null) {
+            writer.writeNext(header);
+        }
 
-			for (List<String> entry : entries) {
-				List<String> nextLine = new ArrayList<>();
-				if (entryPrefix != null) {
-					nextLine.addAll(entryPrefix);
-				}
-				nextLine.addAll(entry);
+        for (T t : data) {
 
-				allLines.add(nextLine);
-			}
-			writer.writeAll(allLines);
+            List<List<String>> entries = entryFunction.apply(t);
 
-		}
-	}
+            if (entries == null) {
+                continue;
+            }
+
+            List<List<String>> allLines = new ArrayList<>();
+
+            for (List<String> entry : entries) {
+                List<String> nextLine = new ArrayList<>();
+                if (entryPrefix != null) {
+                    nextLine.addAll(entryPrefix);
+                }
+                nextLine.addAll(entry);
+
+                allLines.add(nextLine);
+            }
+            writer.writeAll(allLines);
+
+        }
+    }
 }
