@@ -3,11 +3,15 @@ package seers.appcore.csv;
 import net.quux00.simplecsv.*;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CSVHelper {
 
     public static final char DEFAULT_SEPARATOR = ';';
@@ -60,6 +64,17 @@ public class CSVHelper {
             }
 
             return data;
+        }
+    }
+
+    public static void writeCSV(Path filePath, Stream<Stream<Object>> rows) throws IOException {
+        try (CsvWriter writer = getWriter(filePath.toFile(), DEFAULT_SEPARATOR, false)) {
+            rows.forEachOrdered(s ->
+                    writer.writeNext(
+                            s.map(String::valueOf)
+                                    .collect(Collectors.toList())
+                    )
+            );
         }
     }
 
