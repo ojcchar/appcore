@@ -96,7 +96,7 @@ public class ThreadExecutor {
 			final ThreadParameters params) throws Exception {
 
 		// threads
-		int poolSize = 15;
+		int poolSize = 8;
 		int pageSize = getPageSize(objects, poolSize);
 
 		return executePaginated(objects, class1, params, poolSize, pageSize);
