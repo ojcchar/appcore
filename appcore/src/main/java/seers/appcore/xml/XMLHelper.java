@@ -32,24 +32,24 @@ public class XMLHelper {
 
     @Deprecated
     public static void writeXML(Class<?> class1, Object obj, String outputFile)
-            throws FileNotFoundException, JAXBException {
+            throws JAXBException {
         writeXML(class1, obj, new File(outputFile));
     }
 
     @Deprecated
     public static void writeXML(Class<?> class1, Object obj, File outputFile)
-            throws JAXBException, FileNotFoundException {
+            throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(class1);
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         m.marshal(obj, outputFile);
     }
 
-    public static void writeXML(Object obj, String outputFile) throws FileNotFoundException, JAXBException {
+    public static void writeXML(Object obj, String outputFile) throws JAXBException {
         writeXML(obj, new File(outputFile));
     }
 
-    public static void writeXML(Object obj, File outputFile) throws JAXBException, FileNotFoundException {
+    public static void writeXML(Object obj, File outputFile) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(obj.getClass());
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
