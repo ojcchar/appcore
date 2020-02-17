@@ -3,7 +3,9 @@ package seers.appcore.csv;
 import net.quux00.simplecsv.*;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -121,7 +123,10 @@ public class CSVHelper {
     }
 
     public static CsvWriter getWriter(File file, char separator, boolean append) throws IOException {
-        return new CsvWriterBuilder(new FileWriter(file, append)).separator(separator)
+        BufferedWriter writer =
+                Files.newBufferedWriter(file.toPath(), append ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
+
+        return new CsvWriterBuilder(writer).separator(separator)
                 .escapeChar(CsvWriter.NO_ESCAPE_CHARACTER).build();
     }
 
