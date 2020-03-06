@@ -123,8 +123,10 @@ public class CSVHelper {
     }
 
     public static CsvWriter getWriter(File file, char separator, boolean append) throws IOException {
+        StandardOpenOption option = append ? StandardOpenOption.APPEND : StandardOpenOption.TRUNCATE_EXISTING;
+
         BufferedWriter writer =
-                Files.newBufferedWriter(file.toPath(), append ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
+                Files.newBufferedWriter(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, option);
 
         return new CsvWriterBuilder(writer).separator(separator)
                 .escapeChar(CsvWriter.NO_ESCAPE_CHARACTER).build();
